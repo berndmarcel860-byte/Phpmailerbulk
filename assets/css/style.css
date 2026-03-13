@@ -1,0 +1,118 @@
+/* PhpMailerBulk - Admin Stylesheet */
+
+:root {
+    --primary: #0d6efd;
+    --sidebar-width: 250px;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+}
+
+/* Stat cards */
+.stat-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    transition: transform .15s ease;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+.stat-card .stat-icon {
+    font-size: 2.5rem;
+    opacity: .85;
+}
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.stat-card .stat-label {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    opacity: .7;
+}
+
+/* Tables */
+.table-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    overflow: hidden;
+}
+.table-wrapper .table {
+    margin-bottom: 0;
+}
+.table th {
+    background: #f8f9fa;
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #6c757d;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Forms */
+.card-form {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+/* Badges */
+.badge-status-sent      { background-color: #198754; }
+.badge-status-failed    { background-color: #dc3545; }
+.badge-status-running   { background-color: #0d6efd; }
+.badge-status-pending   { background-color: #6c757d; }
+.badge-status-completed { background-color: #198754; }
+.badge-status-paused    { background-color: #fd7e14; }
+
+/* HTML editor area */
+.html-editor {
+    font-family: 'Courier New', monospace;
+    font-size: .85rem;
+    min-height: 350px;
+    resize: vertical;
+}
+
+/* Login page */
+.login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+.login-card {
+    width: 400px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    border: none;
+}
+.login-logo {
+    font-size: 3rem;
+    color: #0d6efd;
+}
+
+/* Progress bar */
+.progress-thin {
+    height: 6px;
+    border-radius: 3px;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.navbar-brand {
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .stat-card .stat-number { font-size: 1.5rem; }
+}
