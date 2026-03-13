@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/ai_generator.php';
 
 require_login();
 
@@ -57,7 +58,8 @@ if ($action === 'edit' && isset($_GET['id'])) {
     $edit_tpl = $edit_tpl->fetch();
 }
 
-$templates = $db->query('SELECT id, name, subject, created_at FROM email_templates ORDER BY id DESC')->fetchAll();
+$templates  = $db->query('SELECT id, name, subject, created_at FROM email_templates ORDER BY id DESC')->fetchAll();
+$ai_enabled = ai_is_enabled();
 
 $page_title = 'Email Templates';
 require __DIR__ . '/partials/header.php';
@@ -78,16 +80,113 @@ require __DIR__ . '/partials/header.php';
         <code>{{email}}</code> <code>{{platform}}</code> <code>{{amount}}</code> <code>{{date}}</code>
     </div>
 
-    <form method="post">
+    <!-- ── AI Generator Panel ───────────────────────────────────────────────── -->
+    <div class="ai-panel card mb-4 border-0 <?= $ai_enabled ? 'ai-panel--enabled' : 'ai-panel--disabled' ?>">
+        <div class="ai-panel__header d-flex align-items-center gap-2 p-3">
+            <span class="ai-panel__icon"><i class="bi bi-robot"></i></span>
+            <div>
+                <strong class="ai-panel__title">AI Template Generator</strong>
+                <span class="ai-panel__sub ms-2 small">
+                    <?php if ($ai_enabled): ?>
+                        Powered by OpenAI &mdash; generates professional fund-recovery emails (German by default)
+                    <?php else: ?>
+                        Add your <code>OPENAI_API_KEY</code> to <code>config.php</code> to enable
+                    <?php endif; ?>
+                </span>
+            </div>
+            <?php if ($ai_enabled): ?>
+            <button type="button" id="btn-ai-collapse" class="btn btn-sm btn-outline-light ms-auto"
+                    data-bs-toggle="collapse" data-bs-target="#aiPanel" aria-expanded="true">
+                <i class="bi bi-chevron-up"></i>
+            </button>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($ai_enabled): ?>
+        <div class="collapse show" id="aiPanel">
+            <div class="ai-panel__body p-3">
+                <div class="row g-3">
+                    <!-- Language -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Language</label>
+                        <select id="ai_language" class="form-select form-select-sm">
+                            <option value="de" selected>&#127465;&#127466; Deutsch (German)</option>
+                            <option value="en">&#127468;&#127463; English</option>
+                        </select>
+                    </div>
+                    <!-- Scenario -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Email Scenario</label>
+                        <select id="ai_scenario" class="form-select form-select-sm">
+                            <option value="initial" selected>Initial Outreach</option>
+                            <option value="followup">Follow-Up</option>
+                            <option value="final">Final Notice</option>
+                            <option value="success">Funds Recovered</option>
+                        </select>
+                    </div>
+                    <!-- Tone -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Tone</label>
+                        <select id="ai_tone" class="form-select form-select-sm">
+                            <option value="formal" selected>Formal &amp; Authoritative</option>
+                            <option value="empathetic">Empathetic &amp; Reassuring</option>
+                            <option value="urgent">Urgent &amp; Time-Sensitive</option>
+                        </select>
+                    </div>
+                    <!-- Company -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Company Name</label>
+                        <input type="text" id="ai_company" class="form-control form-control-sm"
+                               value="Kryptox" placeholder="Your company name">
+                    </div>
+                    <!-- Website -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Company Website</label>
+                        <input type="url" id="ai_website" class="form-control form-control-sm"
+                               value="https://kryptox.co.uk" placeholder="https://example.com">
+                    </div>
+                    <!-- Extra instructions -->
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Additional Instructions <small class="text-muted">(optional)</small></label>
+                        <input type="text" id="ai_extra" class="form-control form-control-sm"
+                               placeholder="e.g. mention a 14-day free case review, or specific exchanges like Binance, Coinbase">
+                    </div>
+                </div>
+
+                <div class="mt-3 d-flex align-items-center gap-3 flex-wrap">
+                    <button type="button" id="btn-ai-generate" class="btn btn-ai-generate">
+                        <i class="bi bi-stars"></i>
+                        <span id="ai-btn-text">Generate with AI</span>
+                    </button>
+                    <div id="ai-status" class="small" style="display:none">
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        <span id="ai-status-text">Generating professional template&hellip;</span>
+                    </div>
+                    <div id="ai-error" class="alert alert-danger py-1 px-2 small mb-0" style="display:none"></div>
+                </div>
+
+                <div class="mt-2">
+                    <small class="text-muted" style="color:rgba(255,255,255,.5)!important">
+                        <i class="bi bi-info-circle me-1"></i>
+                        The AI inserts your template variables automatically. Review the result before saving.
+                    </small>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+    <!-- ── /AI Generator Panel ──────────────────────────────────────────────── -->
+
+    <form method="post" id="template-form">
         <input type="hidden" name="id" value="<?= $edit_tpl['id'] ?? 0 ?>">
 
         <div class="mb-3">
             <label class="form-label">Template Name <span class="text-danger">*</span></label>
-            <input type="text" name="name" class="form-control" value="<?= h($edit_tpl['name'] ?? '') ?>" required>
+            <input type="text" name="name" id="tpl_name" class="form-control" value="<?= h($edit_tpl['name'] ?? '') ?>" required>
         </div>
         <div class="mb-3">
             <label class="form-label">Email Subject <span class="text-danger">*</span></label>
-            <input type="text" name="subject" class="form-control" value="<?= h($edit_tpl['subject'] ?? '') ?>"
+            <input type="text" name="subject" id="tpl_subject" class="form-control" value="<?= h($edit_tpl['subject'] ?? '') ?>"
                 placeholder="e.g. Dear {{first_name}}, your account update" required>
         </div>
         <div class="mb-3">
@@ -100,7 +199,7 @@ require __DIR__ . '/partials/header.php';
             </div>
         </div>
         <div class="mb-3">
-            <label class="form-label">Plain-Text Body <small class="text-muted">(optional – auto-generated if blank)</small></label>
+            <label class="form-label">Plain-Text Body <small class="text-muted">(optional &ndash; auto-generated if blank)</small></label>
             <textarea name="text_body" class="form-control html-editor" style="min-height:100px"><?= h($edit_tpl['text_body'] ?? '') ?></textarea>
         </div>
         <div class="d-flex gap-2">
@@ -149,7 +248,7 @@ require __DIR__ . '/partials/header.php';
  * Return a professional default HTML email template.
  */
 function get_default_template(): string {
-    return <<<HTML
+    return <<<'HTML'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -176,7 +275,7 @@ function get_default_template(): string {
               We have an important update regarding your account on <strong>{{platform}}</strong>.
             </p>
             <p style="color:#555;line-height:1.6;font-size:15px;">
-              Your balance of <strong>\${{amount}}</strong> is ready for processing as of <strong>{{date}}</strong>.
+              Your balance of <strong>${{amount}}</strong> is ready for processing as of <strong>{{date}}</strong>.
             </p>
             <div style="text-align:center;margin:30px 0;">
               <a href="#" style="background:#0d6efd;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-size:16px;font-weight:bold;">
@@ -193,7 +292,7 @@ function get_default_template(): string {
           <td style="background:#f8f9fa;padding:20px 40px;text-align:center;border-top:1px solid #eee;">
             <p style="color:#999;font-size:12px;margin:0;">
               You received this email because you are a registered user.<br>
-              © 2024 Company Name. All rights reserved.
+              &copy; 2024 Company Name. All rights reserved.
             </p>
           </td>
         </tr>

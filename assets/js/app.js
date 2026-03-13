@@ -81,4 +81,92 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // ── AI Template Generator ────────────────────────────────────────────────
+    var btnAiGenerate = document.getElementById('btn-ai-generate');
+    if (btnAiGenerate) {
+        btnAiGenerate.addEventListener('click', function () {
+            var language = document.getElementById('ai_language').value;
+            var scenario = document.getElementById('ai_scenario').value;
+            var tone     = document.getElementById('ai_tone').value;
+            var company  = document.getElementById('ai_company').value;
+            var website  = document.getElementById('ai_website').value;
+            var extra    = document.getElementById('ai_extra').value;
+
+            var statusEl = document.getElementById('ai-status');
+            var errorEl  = document.getElementById('ai-error');
+            var btnText  = document.getElementById('ai-btn-text');
+            var htmlArea = document.getElementById('html_body');
+            var subjectEl = document.getElementById('tpl_subject');
+
+            // Reset UI
+            errorEl.style.display  = 'none';
+            statusEl.style.display = 'flex';
+            btnAiGenerate.disabled  = true;
+            btnText.textContent     = 'Generating…';
+
+            var scenarioLabels = {
+                initial:  'Generating initial outreach…',
+                followup: 'Generating follow-up email…',
+                final:    'Generating final notice…',
+                success:  'Generating success notification…',
+            };
+            document.getElementById('ai-status-text').textContent =
+                (scenarioLabels[scenario] || 'Generating template…') +
+                ' This may take 10–20 seconds.';
+
+            var body = new URLSearchParams({
+                language: language,
+                scenario: scenario,
+                tone:     tone,
+                company:  company,
+                website:  website,
+                extra:    extra,
+            });
+
+            fetch('ai_generate.php', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body:    body.toString(),
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                statusEl.style.display = 'none';
+                btnAiGenerate.disabled  = false;
+                btnText.textContent     = 'Generate with AI';
+
+                if (!data.ok) {
+                    errorEl.textContent    = data.error || 'Unknown error from AI.';
+                    errorEl.style.display  = 'block';
+                    return;
+                }
+
+                // Inject generated HTML
+                if (htmlArea && data.html) {
+                    htmlArea.value = data.html;
+                }
+
+                // Inject subject if field is empty or user confirms overwrite
+                if (subjectEl && data.subject) {
+                    var preview = data.subject.length > 100
+                        ? data.subject.substring(0, 100) + '…'
+                        : data.subject;
+                    if (!subjectEl.value.trim() || confirm('Replace the current subject line with the AI-generated one?\n\n"' + preview + '"')) {
+                        subjectEl.value = data.subject;
+                    }
+                }
+
+                // Flash success feedback
+                btnText.textContent = '✓ Template Generated!';
+                setTimeout(function () { btnText.textContent = 'Generate with AI'; }, 3000);
+            })
+            .catch(function (err) {
+                statusEl.style.display = 'none';
+                btnAiGenerate.disabled  = false;
+                btnText.textContent     = 'Generate with AI';
+                errorEl.textContent    = 'Network error: ' + err.message;
+                errorEl.style.display  = 'block';
+            });
+        });
+    }
+
 });

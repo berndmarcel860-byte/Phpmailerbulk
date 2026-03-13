@@ -154,6 +154,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $config .= "define('SESSION_SECRET', " . var_export($secret, true) . ");\n";
             $config .= "define('DEFAULT_EMAILS_PER_SMTP', 3);\n";
             $config .= "define('DEFAULT_PAUSE_SECONDS',   5);\n";
+            $config .= "// AI template generator – add your OpenAI key to enable\n";
+            $config .= "define('OPENAI_API_KEY', '');\n";
+            $config .= "define('OPENAI_MODEL',   'gpt-4o-mini');\n";
 
             file_put_contents($root . '/config.php', $config);
             $success = true;

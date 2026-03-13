@@ -116,3 +116,78 @@ body {
 @media (max-width: 576px) {
     .stat-card .stat-number { font-size: 1.5rem; }
 }
+
+/* ── AI Template Generator Panel ── */
+.ai-panel {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+.ai-panel--enabled {
+    background: linear-gradient(135deg, #0f2044 0%, #1a3a6e 100%);
+    box-shadow: 0 4px 20px rgba(13, 110, 253, .25);
+}
+.ai-panel--disabled {
+    background: #343a40;
+    opacity: .65;
+}
+.ai-panel__header {
+    background: rgba(0,0,0,.25);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.ai-panel__icon {
+    font-size: 1.6rem;
+    color: #ffd700;
+    line-height: 1;
+}
+.ai-panel__title {
+    color: #fff;
+    font-size: 1rem;
+}
+.ai-panel__sub {
+    color: rgba(255,255,255,.65);
+}
+.ai-panel__body {
+    background: rgba(255,255,255,.04);
+}
+.ai-panel__body .form-label {
+    color: rgba(255,255,255,.85);
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: .25rem;
+}
+.ai-panel__body .form-control,
+.ai-panel__body .form-select {
+    background: rgba(255,255,255,.1);
+    border-color: rgba(255,255,255,.2);
+    color: #fff;
+}
+.ai-panel__body .form-control:focus,
+.ai-panel__body .form-select:focus {
+    background: rgba(255,255,255,.15);
+    border-color: #ffd700;
+    box-shadow: 0 0 0 3px rgba(255,215,0,.2);
+    color: #fff;
+}
+.ai-panel__body .form-control::placeholder { color: rgba(255,255,255,.4); }
+.ai-panel__body .form-select option { background: #1a3a6e; color: #fff; }
+
+.btn-ai-generate {
+    background: linear-gradient(135deg, #ffd700, #ffb300);
+    border: none;
+    color: #1a1a1a;
+    font-weight: 700;
+    padding: .5rem 1.4rem;
+    border-radius: 8px;
+    font-size: .95rem;
+    transition: opacity .15s, transform .1s;
+    white-space: nowrap;
+}
+.btn-ai-generate:hover:not(:disabled) { opacity: .9; transform: translateY(-1px); }
+.btn-ai-generate:disabled { opacity: .6; cursor: not-allowed; }
+.btn-ai-generate i { margin-right: .35rem; }
+
+/* Typing animation for the AI status text */
+@keyframes ai-pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+#ai-status { animation: ai-pulse 1.5s ease-in-out infinite; color: rgba(255,255,255,.75) !important; }
+

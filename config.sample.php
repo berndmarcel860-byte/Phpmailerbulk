@@ -17,3 +17,13 @@ define('DEFAULT_EMAILS_PER_SMTP', 3);
 
 /** Default pause (seconds) between email batches */
 define('DEFAULT_PAUSE_SECONDS', 5);
+
+/**
+ * OpenAI API key for AI-powered email template generation.
+ * Get your key at https://platform.openai.com/api-keys
+ * Leave empty to disable the AI generator.
+ */
+define('OPENAI_API_KEY', '');
+
+/** OpenAI model to use (gpt-4o-mini is recommended for cost/quality balance) */
+define('OPENAI_MODEL', 'gpt-4o-mini');

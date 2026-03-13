@@ -15,6 +15,7 @@ A professional PHP bulk email sending system with a full admin backend.
 - **Anti-Spam Features** – configurable pause between batches, word/phrase replacement filter, professional email headers
 - **Campaign Management** – create campaigns, assign templates and lead groups, control send rate
 - **HTML Email Templates** – full HTML editor with live preview; variable substitution from lead data (`{{first_name}}`, `{{last_name}}`, `{{email}}`, `{{platform}}`, `{{amount}}`, `{{date}}`)
+- **AI Template Generator** – one-click generation of professional fund-recovery email templates via OpenAI (German by default, English also supported); choose scenario (Initial Outreach / Follow-Up / Final Notice / Funds Recovered), tone, and company branding
 - **Statistics** – per-campaign stats: sent, failed, success rate, per-SMTP breakdown, CSV export of logs
 - **Anti-Spam Word Filters** – admin-managed list of spam-trigger words replaced automatically before sending
 - **Cron Support** – background sending script for large lists
@@ -90,6 +91,31 @@ CSV column names are auto-detected from the header row. Supported aliases:
 
 ### Anti-Spam Rules
 Go to **Anti-Spam** to manage word replacement rules. These are applied to subject and body before each email is sent.
+
+### AI Template Generator
+
+The AI generator creates professional fund-recovery emails using OpenAI's GPT models.
+
+**Setup:**
+1. Get an API key at <https://platform.openai.com/api-keys>
+2. Add it to `config.php`:
+   ```php
+   define('OPENAI_API_KEY', 'sk-...');
+   define('OPENAI_MODEL',   'gpt-4o-mini');  // or gpt-4o for highest quality
+   ```
+3. Go to **Templates** → **New Template** — the AI panel appears at the top of the form.
+
+**Options:**
+| Setting | Description |
+|---|---|
+| Language | Deutsch (German, default) or English |
+| Scenario | Initial Outreach / Follow-Up / Final Notice / Funds Recovered |
+| Tone | Formal & Authoritative / Empathetic & Reassuring / Urgent & Time-Sensitive |
+| Company Name | Shown in the email branding (default: Kryptox) |
+| Company Website | Linked in the email footer |
+| Extra Instructions | Free-form additions (mention specific exchanges, add a promo, etc.) |
+
+Click **Generate with AI** — the HTML body and subject are inserted directly into the editor below for review before saving.
 
 ### Background Sending (Cron)
 
