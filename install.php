@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     name        VARCHAR(150) NOT NULL,
                     subject     VARCHAR(255) NOT NULL,
                     html_body   MEDIUMTEXT NOT NULL,
-                    text_body   MEDIUMTEXT NOT NULL DEFAULT '',
+                    text_body   MEDIUMTEXT NOT NULL,
                     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     lead_id      INT UNSIGNED NOT NULL,
                     smtp_id      INT UNSIGNED NOT NULL,
                     status       ENUM('sent','failed') NOT NULL DEFAULT 'sent',
-                    error_message TEXT NOT NULL DEFAULT '',
+                    error_message TEXT NOT NULL,
                     sent_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
                     opened_at    DATETIME NULL,
                     INDEX idx_campaign (campaign_id),
