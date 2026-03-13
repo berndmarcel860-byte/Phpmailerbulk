@@ -77,12 +77,9 @@ if ($campaign_id) {
             JOIN smtp_accounts s ON s.id = cl.smtp_id
             WHERE cl.campaign_id = ?
             ORDER BY cl.id DESC
-            LIMIT :lim OFFSET :off
+            LIMIT ? OFFSET ?
         ");
-        $s5->bindValue(1, $campaign_id, PDO::PARAM_INT);
-        $s5->bindValue(':lim', $per_page, PDO::PARAM_INT);
-        $s5->bindValue(':off', $offset,   PDO::PARAM_INT);
-        $s5->execute();
+        $s5->execute([$campaign_id, $per_page, $offset]);
         $logs = $s5->fetchAll();
     }
 }
